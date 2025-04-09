@@ -1,4 +1,5 @@
 # EduTrack
+Our app, Your data, Our report, Your Happiness
 ## Student Feedback Manager 
 This repository is used to maintain the student feedback manager. This repository is aimed to maintain the feedback from student 
 ### This app includes:
