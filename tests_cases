@@ -1,0 +1,100 @@
+import unittest
+from feedback_summary import summarize_feedback
+
+
+class TestFeedbackSummary(unittest.TestCase):
+    def test_all_sentiments_present(self):
+        data = [
+            {"sentiment": "positive"},
+            {"sentiment": "neutral"},
+            {"sentiment": "negative"},
+            {"sentiment": "positive"},
+            {"sentiment": "neutral"}
+        ]
+        result = summarize_feedback(data)
+        self.assertEqual(result["total_feedback"], 5)
+        self.assertEqual(result["positive"], 2)
+        self.assertEqual(result["neutral"], 2)
+        self.assertEqual(result["negative"], 1)
+
+    def test_empty_feedback_list(self):
+        result = summarize_feedback([])
+        self.assertEqual(result["total_feedback"], 0)
+        self.assertEqual(result["positive"], 0)
+        self.assertEqual(result["neutral"], 0)
+        self.assertEqual(result["negative"], 0)
+
+    def test_missing_sentiment_field(self):
+        data = [{"feedback": "Great class!"}, {"sentiment": "positive"}]
+        result = summarize_feedback(data)
+        self.assertEqual(result["total_feedback"], 1)
+        self.assertEqual(result["positive"], 1)
+
+    def test_case_insensitivity(self):
+        data = [
+            {"sentiment": "Positive"},
+            {"sentiment": "NEUTRAL"},
+            {"sentiment": "negative"}
+        ]
+        result = summarize_feedback(data)
+        self.assertEqual(result["positive"], 1)
+        self.assertEqual(result["neutral"], 1)
+        self.assertEqual(result["negative"], 1)
+
+
+if _name_ == "_main_":
+    unittest.main()
+# feedback_summary.py
+
+"""
+Feedback Summary Module for EduTrack's Student Feedback Manager.
+
+This module processes a list of student feedback entries and summarizes
+the number of positive, neutral, and negative responses.
+
+Author: EduTrack Dev Team
+"""
+
+from collections import Counter
+from typing import List, Dict
+
+
+def summarize_feedback(feedback_list: List[Dict[str, str]]) -> Dict[str, int]:
+    """
+    Summarizes sentiment counts from a list of feedback entries.
+
+    Args:
+        feedback_list (List[Dict]): A list of feedback dicts with a 'sentiment' key.
+
+    Returns:
+        Dict[str, int]: A dictionary with total, positive, neutral, and negative counts.
+    """
+    sentiment_counter = Counter()
+
+    for entry in feedback_list:
+        sentiment = entry.get("sentiment", "unknown").lower()
+        if sentiment in ["positive", "neutral", "negative"]:
+            sentiment_counter[sentiment] += 1
+
+    total = sum(sentiment_counter.values())
+    return {
+        "total_feedback": total,
+        "positive": sentiment_counter.get("positive", 0),
+        "neutral": sentiment_counter.get("neutral", 0),
+        "negative": sentiment_counter.get("negative", 0)
+    }
+
+
+def print_summary(summary: Dict[str, int]) -> None:
+    """
+    Prints a formatted summary to the console.
+
+    Args:
+        summary (Dict[str, int]): Summary dictionary with sentiment counts.
+    """
+    print("📊 Feedback Summary:")
+    print(f"- Total feedback: {summary['total_feedback']}")
+    print(f"- Positive: {summary['positive']}")
+    print(f"- Neutral: {summary['neutral']}")
+    print(f"- Negative: {summary['negative']}")
+
